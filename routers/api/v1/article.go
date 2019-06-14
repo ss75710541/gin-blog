@@ -163,7 +163,6 @@ func AddArticle(c *gin.Context) {
 	})
 }
 
-
 type EditArticleForm struct {
 	ID            int    `form:"id" valid:"Required;Min(1)"`
 	TagID         int    `form:"tag_id" valid:"Required;Min(1)"`

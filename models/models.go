@@ -15,7 +15,7 @@ type Model struct {
 	ID         int `gorm:"primary_key" json:"id"`
 	CreatedOn  int `json:"create_on"`
 	ModifiedOn int `json:"modified_on"`
-	DeletedOn int `json:deleted_on`
+	DeletedOn  int `json:deleted_on`
 }
 
 func init() {
@@ -64,8 +64,8 @@ func CloseDB() {
 }
 
 // updateTimeStampForCreateCollback will set `CreatedOn`, `ModifiedOn` when creating
-func updateTimeStampForCreateCallback(scope *gorm.Scope){
-	if !scope.HasError(){
+func updateTimeStampForCreateCallback(scope *gorm.Scope) {
+	if !scope.HasError() {
 		nowTime := time.Now().Unix()
 		if createTimeField, ok := scope.FieldByName("CreatedOn"); ok {
 			if createTimeField.IsBlank {
@@ -106,14 +106,14 @@ func deleteCallback(scope *gorm.Scope) {
 				scope.AddToVars(time.Now().Unix()),
 				addExtraSpaceIfExist(scope.CombinedConditionSql()),
 				addExtraSpaceIfExist(extraOption),
-				)).Exec()
+			)).Exec()
 		} else {
 			scope.Raw(fmt.Sprintf(
 				"DELETE FROM %v%v%v",
 				scope.QuotedTableName(),
 				addExtraSpaceIfExist(scope.CombinedConditionSql()),
 				addExtraSpaceIfExist(extraOption),
-				)).Exec()
+			)).Exec()
 		}
 	}
 }

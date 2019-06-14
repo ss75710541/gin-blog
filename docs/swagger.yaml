@@ -21,7 +21,7 @@ paths:
       - description: CreatedBy
         in: query
         name: created_by
-        type: integer
+        type: string
       produces:
       - application/json
       responses:
@@ -205,7 +205,7 @@ paths:
       - description: CreatedBy
         in: query
         name: created_by
-        type: integer
+        type: string
       - description: Token
         in: query
         name: token

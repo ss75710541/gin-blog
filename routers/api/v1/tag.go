@@ -35,6 +35,9 @@ func GetTags(c *gin.Context) {
 		maps["state"] = state
 	}
 
+	// 未标识删除
+	maps["deleted_on"] = 0
+
 	code := e.SUCCESS
 
 	data["lists"] = models.GetTags(util.GetPage(c), setting.PageSize, maps)
@@ -55,7 +58,7 @@ func GetTags(c *gin.Context) {
 // @Produce json
 // @Param name query string false "Name"
 // @Param state query int false "State"
-// @Param created_by query int false "CreatedBy"
+// @Param created_by query string false "CreatedBy"
 // @Param token query string true "Token"
 // @Success 200 {string} json "{"code":200,"data":{},"msg":"ok"}"
 // @Router /api/v1/tags [post]

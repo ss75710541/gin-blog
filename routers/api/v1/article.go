@@ -16,6 +16,7 @@ import (
 // @Tags 文章
 // @Produce  json
 // @Param id path int true "ID"
+// @Param token query string true "Token"
 // @Success 200 {string} json "{"code":200,"data":{},"msg":"ok"}"
 // @Router /api/v1/articles/{id} [get]
 func GetArticle(c *gin.Context) {
@@ -52,6 +53,7 @@ func GetArticle(c *gin.Context) {
 // @Param tag_id path int false "TagID"
 // @Param state query int false "State"
 // @Param created_by query string false "CreatedBy"
+// @Param token query string true "Token"
 // @Success 200 {string} json "{"code":200,"data":{},"msg":"ok"}"
 // @Router /api/v1/articles [get]
 func GetArticles(c *gin.Context) {
@@ -81,7 +83,7 @@ func GetArticles(c *gin.Context) {
 	if !valid.HasErrors() {
 		code = e.SUCCESS
 
-		data["lists"] = models.GetArticles(util.GetPage(c), setting.PageSize, maps)
+		data["lists"] = models.GetArticles(util.GetPage(c), setting.AppSetting.PageSize, maps)
 		data["total"] = models.GetArticleTotal(maps)
 	} else {
 		for _, err := range valid.Errors {
@@ -115,6 +117,7 @@ type AddArticleForm struct {
 // @Param content query string true "Content"
 // @Param created_by query string true "CreatedBy"
 // @Param state query int true "State"
+// @Param cover_image_url query string false "CoverImageUrl"
 // @Param token query string true "Token"
 // @Success 200 {string} json "{"code":200,"data":{},"msg":"ok"}"
 // @Router /api/v1/articles [post]
@@ -125,6 +128,7 @@ func AddArticle(c *gin.Context) {
 	content := c.Query("content")
 	createdBy := c.Query("created_by")
 	state := com.StrTo(c.DefaultQuery("state", "0")).MustInt()
+	coverImageUrl := c.Query("cover_image_url")
 
 	valid := validation.Validation{}
 	valid.Min(tagId, 1, "tag_id").Message("标签ID必须大于0")
@@ -133,6 +137,7 @@ func AddArticle(c *gin.Context) {
 	valid.Required(content, "content").Message("内容不能为空")
 	valid.Required(createdBy, "created_by").Message("创建人不能为空")
 	valid.Range(state, 0, 1, "state").Message("状态只允许0或1")
+	valid.MaxSize(coverImageUrl, 255, "cover_image_url").Message("图片Url最长为255字符")
 
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
@@ -142,6 +147,7 @@ func AddArticle(c *gin.Context) {
 			data["title"] = title
 			data["desc"] = desc
 			data["content"] = content
+			data["cover_image_url"] = coverImageUrl
 			data["created_by"] = createdBy
 			data["state"] = state
 
@@ -184,6 +190,7 @@ type EditArticleForm struct {
 // @Param content query string false "Content"
 // @Param modified_by query string true "ModifiedBy"
 // @Param state query int false "State"
+// @Param cover_image_url query string false "CoverImageUrl"
 // @Param token query string true "Token"
 // @Success 200 {string} json "{"code":200,"data":{},"msg":"ok"}"
 // @Router /api/v1/articles/{id} [put]
@@ -196,6 +203,7 @@ func EditArticle(c *gin.Context) {
 	desc := c.Query("desc")
 	content := c.Query("content")
 	modifiedBy := c.Query("modified_by")
+	coverImageUrl := c.Query("cover_image_url")
 
 	var state int = -1
 	if arg := c.Query("state"); arg != "" {
@@ -209,6 +217,7 @@ func EditArticle(c *gin.Context) {
 	valid.MaxSize(content, 65535, "content").Message("内容最长为65535字符")
 	valid.Required(modifiedBy, "modified_by").Message("修改人不能为空")
 	valid.MaxSize(modifiedBy, 100, "modified_by").Message("修改人最长为100字符")
+	valid.MaxSize(coverImageUrl, 255, "cover_image_url").Message("图片Url最长为255字符")
 
 	code := e.INVALID_PARAMS
 	if !valid.HasErrors() {
@@ -226,6 +235,9 @@ func EditArticle(c *gin.Context) {
 				}
 				if content != "" {
 					data["content"] = content
+				}
+				if coverImageUrl != "" {
+					data["cover_image_url"] = coverImageUrl
 				}
 
 				data["modified_by"] = modifiedBy

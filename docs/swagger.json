@@ -37,6 +37,13 @@
                         "description": "CreatedBy",
                         "name": "created_by",
                         "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "token",
+                        "in": "query",
+                        "required": true
                     }
                 ],
                 "responses": {
@@ -101,6 +108,12 @@
                     },
                     {
                         "type": "string",
+                        "description": "CoverImageUrl",
+                        "name": "cover_image_url",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
                         "description": "Token",
                         "name": "token",
                         "in": "query",
@@ -132,6 +145,13 @@
                         "description": "ID",
                         "name": "id",
                         "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "description": "Token",
+                        "name": "token",
+                        "in": "query",
                         "required": true
                     }
                 ],
@@ -195,6 +215,12 @@
                         "type": "integer",
                         "description": "State",
                         "name": "state",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "description": "CoverImageUrl",
+                        "name": "cover_image_url",
                         "in": "query"
                     },
                     {
@@ -442,6 +468,37 @@
                         "description": "password",
                         "name": "password",
                         "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "{\"code\":200,\"data\":{},\"msg\":\"ok\"}",
+                        "schema": {
+                            "type": "string"
+                        }
+                    }
+                }
+            }
+        },
+        "/upload": {
+            "post": {
+                "consumes": [
+                    "multipart/form-data"
+                ],
+                "produces": [
+                    "multipart/form-data"
+                ],
+                "tags": [
+                    "Upload"
+                ],
+                "summary": "上传图片",
+                "parameters": [
+                    {
+                        "type": "file",
+                        "description": "Image File",
+                        "name": "image",
+                        "in": "formData",
                         "required": true
                     }
                 ],

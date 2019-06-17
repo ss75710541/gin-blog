@@ -22,6 +22,11 @@ paths:
         in: query
         name: created_by
         type: string
+      - description: Token
+        in: query
+        name: token
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -64,6 +69,10 @@ paths:
         name: state
         required: true
         type: integer
+      - description: CoverImageUrl
+        in: query
+        name: cover_image_url
+        type: string
       - description: Token
         in: query
         name: token
@@ -109,6 +118,11 @@ paths:
         name: id
         required: true
         type: integer
+      - description: Token
+        in: query
+        name: token
+        required: true
+        type: string
       produces:
       - application/json
       responses:
@@ -151,6 +165,10 @@ paths:
         in: query
         name: state
         type: integer
+      - description: CoverImageUrl
+        in: query
+        name: cover_image_url
+        type: string
       - description: Token
         in: query
         name: token
@@ -303,4 +321,24 @@ paths:
       summary: Get Auth
       tags:
       - Auth
+  /upload:
+    post:
+      consumes:
+      - multipart/form-data
+      parameters:
+      - description: Image File
+        in: formData
+        name: image
+        required: true
+        type: file
+      produces:
+      - multipart/form-data
+      responses:
+        "200":
+          description: '{"code":200,"data":{},"msg":"ok"}'
+          schema:
+            type: string
+      summary: 上传图片
+      tags:
+      - Upload
 swagger: "2.0"

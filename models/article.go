@@ -1,91 +1,125 @@
 package models
 
+import "github.com/jinzhu/gorm"
+
 type Article struct {
 	Model
-
-	TagID int `json:"tag_id" gorm:"index"`
-	Tag   Tag `json:"tag"`
-
-	Title         string `json:"title"`
-	Desc          string `json:"desc"`
-	Content       string `json:"content"`
-	CoverImageUrl string `json:"cover_image_url"`
-	CreatedBy     string `json:"created_by"`
-	ModifiedBy    string `json:"modifled_by"`
-	State         int    `json:"state"`
+	Tag           Tag    `json:"tag"`
+	TagID         int    `form:"tag_id" valid:"Required;Min(1)"`
+	Title         string `form:"title" valid:"Required;MaxSize(100)"`
+	Desc          string `form:"desc" valid:"Required;MaxSize(255)"`
+	Content       string `form:"content" valid:"Required;MaxSize(65535)"`
+	CoverImageUrl string `form:"cover_image_url" valid:"Required;MaxSize(255)"`
+	State         int    `form:"state" valid:"Range(0,1)"`
+	CreatedBy     string `form:"created_by" valid:"Required;MaxSize(100)"`
+	ModifiedBy    string `json:"modifled_by" valid:"Required;MaxSize(100)"`
 }
 
-func ExistArticleByID(id int) bool {
-	var article Article
-	db.Select("id").Where("id = ?", id).First(&article)
+type AddArticleForm struct {
+	TagID         int    `form:"tag_id" valid:"Required;Min(1)"`
+	Title         string `form:"title" valid:"Required;MaxSize(100)"`
+	Desc          string `form:"desc" valid:"Required;MaxSize(255)"`
+	Content       string `form:"content" valid:"Required;MaxSize(65535)"`
+	CoverImageUrl string `form:"cover_image_url" valid:"Required;MaxSize(255)"`
+	State         int    `form:"state" valid:"Range(0,1)"`
+	CreatedBy     string `form:"created_by" valid:"Required;MaxSize(100)"`
+}
 
-	if article.ID > 0 {
-		return true
+type EditArticleForm struct {
+	TagID         int    `form:"tag_id" valid:"Required;Min(1)"`
+	Title         string `form:"title" valid:"Required;MaxSize(100)"`
+	Desc          string `form:"desc" valid:"Required;MaxSize(255)"`
+	Content       string `form:"content" valid:"Required;MaxSize(65535)"`
+	CoverImageUrl string `form:"cover_image_url" valid:"Required;MaxSize(255)"`
+	State         int    `form:"state" valid:"Range(0,1)"`
+	ModifiedBy    string `json:"modifled_by"" valid:"Required;MaxSize(100)"`
+}
+
+// ExistArticleByID checks if an article exists based on I
+func ExistArticleByID(id int) (bool, error) {
+	var article Article
+	err := db.Select("id").Where("id = ? AND deleted_on = ? ", id, 0).First(&article).Error
+
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return false, err
 	}
 
-	return false
+	if article.ID > 0 {
+		return true, nil
+	}
+
+	return false, nil
 }
 
-func GetArticleTotal(maps interface{}) (count int) {
-	db.Model(&Article{}).Where(maps).Count(&count)
+// GetArticleTotal gets the total number of articles based on the constranints
+func GetArticleTotal(maps interface{}) (int, error) {
+	var count int
+	if err := db.Model(&Article{}).Where(maps).Count(&count).Error; err != nil {
+		return 0, err
+	}
 
-	return
+	return count, nil
 }
 
-func GetArticles(pageNum int, pageSize int, maps interface{}) (articles []Article) {
-	db.Preload("Tag").Where(maps).Offset(pageNum).Limit(pageSize).Find(&articles)
+// GetArticles gets a list of articles based on paging contraints
+func GetArticles(pageNum int, pageSize int, maps interface{}) ([]*Article, error) {
+	var articles []*Article
+	err := db.Preload("Tag").Where(maps).Offset(pageNum).Limit(pageSize).Find(&articles).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
 
-	return
+	return articles, nil
 }
 
-func GetArticle(id int) (article Article) {
-	db.Where("id = ?", id).First(&article)
-	db.Model(&article).Related(&article.Tag)
+// GetArticle Get a single article based on ID
+func GetArticle(id int) (*Article, error) {
+	var article Article
+	err := db.Where("id = ? AND deleted_on = ? ", id, 0).First(&article).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
 
-	return
+	err = db.Model(&article).Related(&article.Tag).Error
+	if err != nil && err != gorm.ErrRecordNotFound {
+		return nil, err
+	}
+
+	return &article, nil
 }
 
-func EditArticle(id int, data interface{}) bool {
-	db.Model(&Article{}).Where("id = ?", id).Updates(data)
+// EditArticle modify a single article
+func EditArticle(id int, data interface{}) error {
+	if err := db.Model(&Article{}).Where("id = ? AND deleted_on = ? ", id, 0).Updates(data).Error; err != nil {
+		return err
+	}
 
-	return true
+	return nil
 }
 
-func AddArticle(data map[string]interface{}) bool {
-	db.Create(&Article{
-		TagID:         data["tag_id"].(int),
-		Title:         data["title"].(string),
-		Desc:          data["desc"].(string),
-		Content:       data["content"].(string),
-		CoverImageUrl: data["cover_image_url"].(string),
-		CreatedBy:     data["created_by"].(string),
-		State:         data["state"].(int),
-	})
+// AddArticle add a single article
+func AddArticle(article Article) error {
+	if err := db.Create(&article).Error; err != nil {
+		return err
+	}
 
-	return true
+	return nil
 }
 
-func DeleteArticle(id int) bool {
-	db.Where("id = ?", id).Delete(Article{})
+// DeleteArticle delete a single article
+func DeleteArticle(id int) error {
+	if err := db.Where("id = ?", id).Delete(Article{}).Error; err != nil {
+		return err
+	}
 
-	return true
+	return nil
 }
 
-func CleanAllArticle() bool {
-	db.Unscoped().Where("deleted_on != ? ", 0).Delete(&Article{})
+// CleanAllArticle clear all article
+func CleanAllArticle() error {
+	if err := db.Unscoped().Where("deleted_on != ? ", 0).Delete(&Article{}).Error; err != nil {
+		return err
+	}
 
-	return true
+	return nil
 }
-
-//
-//func (article *Article) BeforeCreate(scope *gorm.Scope) error {
-//	scope.SetColumn("CreatedOn", time.Now().Unix())
-//
-//	return nil
-//}
-//
-//func (article *Article) BeforeUpdate(scope *gorm.Scope) error {
-//	scope.SetColumn("ModifiedOn", time.Now().Unix())
-//
-//	return nil
-//}

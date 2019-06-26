@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"gin-blog/models"
+	"gin-blog/pkg/gredis"
 	"gin-blog/pkg/logging"
 	"gin-blog/pkg/setting"
 	"gin-blog/routers"
@@ -11,10 +12,18 @@ import (
 	"syscall"
 )
 
-func main() {
+func init() {
+
 	setting.Setup()
 	models.Setup()
 	logging.Setup()
+	gredis.Setup()
+}
+
+// @termsOfService http://github.com/ss75710541/gin-blog
+// @license.name MIT
+// @license.url http://github.com/ss75710541/gin-blog/blob/master/LICENSE
+func main() {
 
 	endless.DefaultReadTimeOut = setting.ServerSetting.ReadTimeout
 	endless.DefaultWriteTimeOut = setting.ServerSetting.WriteTimeout

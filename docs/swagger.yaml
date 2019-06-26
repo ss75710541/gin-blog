@@ -1,9 +1,74 @@
 basePath: '{{.BasePath}}'
+definitions:
+  app.Response:
+    properties:
+      code:
+        type: integer
+      data:
+        type: object
+      msg:
+        type: string
+    type: object
+  models.AddArticleForm:
+    properties:
+      content:
+        type: string
+      coverImageUrl:
+        type: string
+      createdBy:
+        type: string
+      desc:
+        type: string
+      state:
+        type: integer
+      tagID:
+        type: integer
+      title:
+        type: string
+    type: object
+  models.AddTagForm:
+    properties:
+      createdBy:
+        type: string
+      name:
+        type: string
+      state:
+        type: integer
+    type: object
+  models.EditArticleForm:
+    properties:
+      content:
+        type: string
+      coverImageUrl:
+        type: string
+      desc:
+        type: string
+      modifled_by:
+        type: string
+      state:
+        type: integer
+      tagID:
+        type: integer
+      title:
+        type: string
+    type: object
+  models.EditTagForm:
+    properties:
+      modifiedBy:
+        type: string
+      name:
+        type: string
+      state:
+        type: integer
+    type: object
 host: '{{.Host}}'
 info:
   contact: {}
   description: '{{.Description}}'
-  license: {}
+  license:
+    name: MIT
+    url: http://github.com/ss75710541/gin-blog/blob/master/LICENSE
+  termsOfService: http://github.com/ss75710541/gin-blog
   title: '{{.Title}}'
   version: '{{.Version}}'
 paths:
@@ -11,7 +76,7 @@ paths:
     get:
       parameters:
       - description: TagID
-        in: path
+        in: query
         name: tag_id
         type: integer
       - description: State
@@ -31,48 +96,27 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":200,"data":{},"msg":"ok"}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/app.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+            type: object
       summary: 获取多个文章
       tags:
       - 文章
     post:
       parameters:
-      - description: TagID
-        in: query
-        name: tag_id
+      - description: Add article
+        in: body
+        name: article
         required: true
-        type: integer
-      - description: Title
-        in: query
-        name: title
-        required: true
-        type: string
-      - description: Desc
-        in: query
-        name: desc
-        required: true
-        type: string
-      - description: Content
-        in: query
-        name: content
-        required: true
-        type: string
-      - description: CreatedBy
-        in: query
-        name: created_by
-        required: true
-        type: string
-      - description: State
-        in: query
-        name: state
-        required: true
-        type: integer
-      - description: CoverImageUrl
-        in: query
-        name: cover_image_url
-        type: string
+        schema:
+          $ref: '#/definitions/models.AddArticleForm'
+          type: object
       - description: Token
         in: query
         name: token
@@ -82,9 +126,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":200,"data":{},"msg":"ok"}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/app.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+            type: object
       summary: 新增文章
       tags:
       - 文章
@@ -105,9 +155,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":200,"data":{},"msg":"ok"}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/app.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+            type: object
       summary: 删除文章
       tags:
       - 文章
@@ -127,9 +183,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":200,"data":{},"msg":"ok"}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/app.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+            type: object
       summary: 获取单个文章
       tags:
       - 文章
@@ -140,35 +202,13 @@ paths:
         name: id
         required: true
         type: integer
-      - description: TagID
-        in: query
-        name: tag_id
-        type: string
-      - description: Title
-        in: query
-        name: title
-        type: string
-      - description: Desc
-        in: query
-        name: desc
-        type: string
-      - description: Content
-        in: query
-        name: content
-        type: string
-      - description: ModifiedBy
-        in: query
-        name: modified_by
+      - description: Edit article
+        in: body
+        name: article
         required: true
-        type: string
-      - description: State
-        in: query
-        name: state
-        type: integer
-      - description: CoverImageUrl
-        in: query
-        name: cover_image_url
-        type: string
+        schema:
+          $ref: '#/definitions/models.EditArticleForm'
+          type: object
       - description: Token
         in: query
         name: token
@@ -178,9 +218,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":200,"data":{},"msg":"ok"}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/app.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+            type: object
       summary: 修改文章
       tags:
       - 文章
@@ -204,26 +250,27 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":200,"data":{},"msg":"ok"}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/app.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+            type: object
       summary: 获取多个文章标签
       tags:
       - 标签
     post:
       parameters:
-      - description: Name
-        in: query
-        name: name
-        type: string
-      - description: State
-        in: query
-        name: state
-        type: integer
-      - description: CreatedBy
-        in: query
-        name: created_by
-        type: string
+      - description: Add tag
+        in: body
+        name: tag
+        required: true
+        schema:
+          $ref: '#/definitions/models.AddTagForm'
+          type: object
       - description: Token
         in: query
         name: token
@@ -233,9 +280,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":200,"data":{},"msg":"ok"}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/app.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+            type: object
       summary: 新增文章标签
       tags:
       - 标签
@@ -256,9 +309,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":200,"data":{},"msg":"ok"}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/app.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+            type: object
       summary: 删除文章标签
       tags:
       - 标签
@@ -269,20 +328,13 @@ paths:
         name: id
         required: true
         type: integer
-      - description: Name
-        in: query
-        name: name
+      - description: Edit tag
+        in: body
+        name: tag
         required: true
-        type: string
-      - description: State
-        in: query
-        name: state
-        type: integer
-      - description: ModifiedBy
-        in: query
-        name: modified_by
-        required: true
-        type: string
+        schema:
+          $ref: '#/definitions/models.EditTagForm'
+          type: object
       - description: Token
         in: query
         name: token
@@ -292,9 +344,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":200,"data":{},"msg":"ok"}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/app.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+            type: object
       summary: 修改文章标签
       tags:
       - 标签
@@ -315,9 +373,15 @@ paths:
       - application/json
       responses:
         "200":
-          description: '{"code":200,"data":{},"msg":"ok"}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/app.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+            type: object
       summary: Get Auth
       tags:
       - Auth
@@ -331,13 +395,24 @@ paths:
         name: image
         required: true
         type: file
+      - description: Token
+        in: query
+        name: token
+        required: true
+        type: string
       produces:
       - multipart/form-data
       responses:
         "200":
-          description: '{"code":200,"data":{},"msg":"ok"}'
+          description: OK
           schema:
-            type: string
+            $ref: '#/definitions/app.Response'
+            type: object
+        "500":
+          description: Internal Server Error
+          schema:
+            $ref: '#/definitions/app.Response'
+            type: object
       summary: 上传图片
       tags:
       - Upload
